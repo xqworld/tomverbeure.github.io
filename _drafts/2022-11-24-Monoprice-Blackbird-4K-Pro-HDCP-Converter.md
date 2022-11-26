@@ -29,7 +29,8 @@ protocol conversion boxes.
 
 After removing the top cover, you're greeted with the following:
 
-![Inside view - annotated](/assets/hdcp_converter/inside_view annotated.jpg)
+[![Inside view - annotated](/assets/hdcp_converter/inside_view annotated.jpg)](/assets/hdcp_converter/inside_view annotated.jpg)
+*(Click to enlarge)*
 
 As expected, the design is straightforward: the main conversion IC, an SPI flash memory, a microcontroller, 
 and a bunch of jellybean components to create power rails.
@@ -81,6 +82,19 @@ Let's look at the main actors:
     [Single Wire Interface Module](http://kuku.eu.org/?projects/stm8spi/stm8spi#mcb_toc_head1). 
     It's a single-pin equivalent of the more common JTAG interface.
 
+
+# Tests done
+
+* Basic plan: 
+    * Linux machine through converter: no HDCP seen. Works
+    * Shield TV to HDCP 1.4 TV through converter: HDCP 2 on source, HDCP 1 on TV. Works.
+
+* Premium plan:
+    * Linux machine: no HDCP seen. Only HD content. Works.
+    * Shield TV directly to HDPC 2 monitor: 4K and HDR content. Works.
+    * Shield TV to HDPC 2 monitor via down converter: Black screen. Converter doesn't support 444?
+    * Shield TV to HDPC 2 monitor via down converter in 1080p and HDR. Works! Is this Type 1 or Type 0 content???
+    * Shield TV directly to old TV: 1080p HD only. No HDR listed.
 
 # Components
 
