@@ -1,0 +1,23 @@
+Sync Detect: OFF
+
+Upstream Connect Status Changed:
+   Link Type is: None
+
+AV Mute Status Changed:
+   AV Mute OFF
+
+Tx HDCP  Version:
+   HDCP version is: 1.x
+
+Tx HDCP Status Changed:
+   Tx HDCP Authentication Off.
+
+Rx HDCP  Version:
+   HDCP version not support
+
+Rx HDCP Status Changed:
+   Rx HDCP Authentication Off.
+
+Clock Detect: ON
+
+
