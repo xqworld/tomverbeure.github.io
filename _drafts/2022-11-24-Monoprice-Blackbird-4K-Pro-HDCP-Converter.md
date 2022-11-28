@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Monoprice Blackbird 4K Pro HDCP Converter
+title: Monoprice HDCP 2.2 to 1.4 Down Converter Protocol Analysis
 date:  2022-11-24 00:00:00 -1000
 categories:
 ---
@@ -17,6 +17,43 @@ content on 4K displays with the old HDCP 1.4 standard."
 
 Stuffed after a delicious Thanksgiving meal, I decided to take it apart after the guests had left. It's
 a simple single-function device, so I didn't expect much, but maybe there's some things to be learned?
+
+# Some Words about HDCP
+
+HDCP ([High-Bandwidth Digital Content Protection](https://en.wikipedia.org/wiki/High-bandwidth_Digital_Content_Protection))
+version 1 dates from somewhere at the beginning of the century and turned out to be terrible broken.
+By 2010, it was completely defeated with the release of the 
+[master key](https://github.com/rjw57/hdcp-genkey/blob/master/master-key.txt)[^1] that can be used to 
+generate transmit and receive keys at will.
+
+To keep Hollywood happy, a succesor was invented: HDCP 2.0, an entirely new protocol with no similarities 
+to revision 1.  This time, the creators decided use to standard cryptographic algorithms such as RSA public key
+authentication, and 128-bit AES encryption. HDCP 2.1 added the concept of content stream types to block the 
+retransmition of high quality video streams (e.g. 4K or HDR) to a lower level of protection.
+
+Despite using known-good core algorithms, there was still 
+[a major issue](https://blog.cryptographyengineering.com/2012/08/27/reposted-cryptanalysis-of-hdcp-v2/)
+in the way certain data was exchanged between transmitter and receiver, necessitating a 2.2 revision
+that wasn't backward compatible with versions 2.0 and 2.1. There's an HDCP version 2.3 now, but
+it's not reallly clear if there are any real-world consequences...
+
+Today, all new TVs support both HDCP 2 and HDCP 1 so that legacy HDCP 1-only sources such as DVD players 
+are still supported. But that wasn't the case initially: the 15 year old 1080p TV in our house dates from well 
+before the introduction of HDCP 2. Luckily, most modern video transmitters (in our case the
+excellent Nvidia Shield TV media play with a brilliant command DMA engine) still support HDCP 1 fine.
+
+There are some issues however: remember how HDCP 2.1 added content stream types? There only 2 of
+them: type 0 and type 1, where type 1 is considered high value. It's up to a content provider to decide 
+whether a video stream gets tagged as such. In the case of Netflix, UHD (4K) and HDR content is classified as 
+type 1 while traditional HD content (720p and 1080p non-HDR) is type 0.
+
+If you have a 4K monitor that only supports HDCP 1, you're out of luck: Netflix will only serve
+1080p streams. The issue can't be solved with repeaters such as home theater video receivers, because 
+the HDCP specification prohibits the downconversion of HDCP2 to HDCP1 for type 1 content.
+
+And yet, there are devices like that Monoprice Blackbird that claimed to be down this conversion just
+fine? Maybe it only supports type 0 content, making it technically HDCP 2 compliant even if it doesn't
+supports only a fraction of the available content? 
 
 # Inside the Monoprice Blackbird 4K Pro
 
@@ -40,9 +77,9 @@ Let's look at the main actors:
 * Silicon Image Sil9679CNUC 
 
     Google has quite a bit of hits for this product, but they're all articles from way back when HDCP 2.2
-    capable televisions were rare. Apparently, this chip was the very first one that allowed televsion 
-    manufacturers to add HDCP 2.2 to their 4K TVs, though with the significant limitation that it can
-    only do YUV 4:2:0.
+    capable TV silicon was rare. Apparently, this chip was the very first one that allowed televsion 
+    manufacturers to add support for HDCP 2.2 to their 4K TVs, though with the significant limitation that it 
+    can only do YUV 4:2:0.
 
     A few years ago, Silicon Image was acquired by Lattice Semiconductor. The Sil9679 is listed on Lattice 
     [TV HDMI / MHL Receivers product page](https://www.latticesemi.com/en/Products/ASSPs/TVHDMIMHLReceivers):
@@ -52,7 +89,11 @@ Let's look at the main actors:
 
     But there's no datasheet to be found.
 
-    However, the Google search for "Sil9679 datasheet" turns up a 
+    BTW, notice how the table above lists HDMI 2.0 support. Most people associate HDMI 2.0 with full quality 4K 60Hz
+    support, which requires a cable bandwidth above the limit of HDMI 1.4. 4K 60Hz in  YUV 4:2:0 mode, however,
+    fits nicely within the capabilities of HDMI 1.4. It's a mystery why the table claims HDMI 2.0 capabilities...
+
+    A Google search for "Sil9679 datasheet" turns up a 
     [datasheet for the Sil9678](https://datasheet.lcsc.com/lcsc/1912111437_Lattice-SiI9678CNUC_C369587.pdf) 
     on LCSC. It's a different product that does exactly the opposite: convert from HDCP 1.4 to HDCP 2.2, but
     it has the same packages and after close examination of the PCB, the pinout seems identical at well!
@@ -249,8 +290,26 @@ Rx HDCP Status Changed:
 Clock Detect: OFF
 ```
 
+# HDCP Details
 
+* [HDCP on HDMI Specification](https://www.digital-cp.com/sites/default/files/HDCP%20on%20HDMI%20Specification%20Rev2_3.pdf)
+  section 3.2 HDCP Cipher: content type is not part of cipher operation.
+* [HDCP on DisplayPort Specification](https://www.digital-cp.com/sites/default/files/specifications/HDCP%20on%20DisplayPort%20Specification%20Rev2_2.pdf)
+   section 3.2 HDCP Cipher: 8-bit content type is XORed with riv to create initialization vector.
 
-* [Reposted: A cryptanalysis of HDCP v2.1](https://blog.cryptographyengineering.com/2012/08/27/reposted-cryptanalysis-of-hdcp-v2/)
-* [hdcp-genkey](https://github.com/rjw57/hdcp-genkey)
+# References
+
 * [HDCP Specifications](https://www.digital-cp.com/hdcp-specifications)
+* [A Cryptanalysis of the High-bandwidth Digital Content Protection System](https://cypherpunks.ca/~iang/pubs/hdcp-drm01.pdf)
+* [A cryptanalysis of HDCP v2.1](https://blog.cryptographyengineering.com/2012/08/27/reposted-cryptanalysis-of-hdcp-v2/)
+* [hdcp-genkey](https://github.com/rjw57/hdcp-genkey)
+
+# Footnotes
+
+[^1]: It wasn't necessary for someone in-the-know to leak the master key, the protocol was so flawed
+      that the master key can be derived using the technique described in 
+      "A Cryptanalysis of the High-bandwidth Digital Content Protection System" by Crosby, et al.
+
+
+
+
