@@ -91,7 +91,7 @@ Let's look at the main actors:
 
     BTW, notice how the table above lists HDMI 2.0 support. Most people associate HDMI 2.0 with full quality 4K 60Hz
     support, which requires a cable bandwidth above the limit of HDMI 1.4. 4K 60Hz in  YUV 4:2:0 mode, however,
-    fits nicely within the capabilities of HDMI 1.4. It's a mystery why the table claims HDMI 2.0 capabilities...
+    fits nicely within the capabilities of HDMI 1.4. It's a mystery why the table claims HDMI 2.0 capabilities...[^2]
 
     A Google search for "Sil9679 datasheet" turns up a 
     [datasheet for the Sil9678](https://datasheet.lcsc.com/lcsc/1912111437_Lattice-SiI9678CNUC_C369587.pdf) 
@@ -310,6 +310,8 @@ Clock Detect: OFF
       that the master key can be derived using the technique described in 
       "A Cryptanalysis of the High-bandwidth Digital Content Protection System" by Crosby, et al.
 
+[^2]: You can the bandwidth requirements with my [video timings calculator](https://tomverbeure.github.io/video_timings_calculator).
+      Just chose 4K/60 in the predefined mode selection box, and toggle between the RGB 4:4:4 or YUV 4:2:0 color formats.
+      You'll see how RGB 4:4:4 requires HDMI 2.0 while YUV 4:2:0 works with HDMI 1.4.
 
-
-
+      ![Video Timings Calculator](/assets/hdcp_converter/video_timings_calculator.png)
