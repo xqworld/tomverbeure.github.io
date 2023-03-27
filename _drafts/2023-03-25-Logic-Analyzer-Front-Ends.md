@@ -167,7 +167,6 @@ the joint reactance $$X_C$$ is 796 Ohm, which is in parallel with $$R_{sink}$$, 
 
 For this case, the voltage divider is now:
 
-
 $$V_{FPGA} = \frac{X_{C}}{X_{C} + R_{src}} V_{src}$$
 
 For an $$R_{src}$$ of 100 Ohm, this makes:
@@ -248,6 +247,105 @@ doesn't influence the value by much).
 
 That give an inductance of $$354nH$$.
 
+# Simulation of the simple wire probe
+
+I like to crosscheck theory with practice, or at least with simulated practice. 
+I use [CircuitLab](https://circuitlab.com) for this. It's free for small designs, but a yearly
+subscription allows me to try larger circuits.
+
+Here's the simple wire probe with inductances, resistors and capacitors added:
+
+![CircuitLab schematic of simple wire probe](/assets/probes/probe_wire_circuitlab_schematic.png)
+
+You can play with it yourself [here](https://www.circuitlab.com/circuit/u9fbs86jc5cz/probe-simple-wire/).
+
+If we generate a 10MHz 3.3V square wave, here's what happens:
+
+[![Transient waveforms of simple wire probe](/assets/probes/probe_wire_waveforms.png)](/assets/probes/probe_wire_waveforms.png)
+*Click to enlarge*
+
+Let's unpack this:
+
+* in blue, we have an ideal square wave.
+* in orange, we have the signal that we want to measure. Under ideal circumstances, this would still be
+  a square wave, but it has been severely mangled by the probe circuit!
+* in light brown, we have the signal that enters the FPGA. There's a massive amount of ringing there.
+
+Instead of a 3.3V signal, the FPGA sees over- and undershoots of 5V and -1.7V. After initially
+shooting up to almost 3.3V, the signal under test drops back down to 2.4V. It also takes about 5ns
+for the signal at the FPGA to rise to 3.3V. 
+
+The frequency response plot at the FPGA shows a major oscillation at the 60MHz point. 
+
+[![Frequency plot of simple wire probe](/assets/probes/probe_wire_freq_plot.png)](/assets/probes/probe_wire_freq_plot.png)
+*Click to enlarge*
+
+This is because the wire inductance and the 20pF capacitor form an resonant LC circuit.
+
+The resonant frequency equation is $$f=2\pi LC$$. Fill in values $$L=354nH$$ and $$C=20pF$$ and you get... 59.8MHz.
+
+*It's important to note that the simulation is pessimistic: we are applying a square wave with an
+infinitely steep rise and fall time. This exagerates the amplitude of the ringing.*
+
+I cobbled together a setup with an FPGA sending out a square wave and recorded it with a classic 200MHz
+oscilloscope probe:
+
+Here's the result on the scope:
+
+![Ringing signal](/assets/probes/probe_wire_oscilloscope.png)
+
+By some amazing coincidence, there's a 60MHz resonance here as well! However, in this case, the resonance
+is due to the oscilloscope probe capacitance and the ground loop which is around 200nH. Still, it's clear that
+a resonant circuit is bad news...
+
+Let's see what other logic analyzer are doing about this...
+
+# The original Saleae Logic
+
+Saleae is a very well known seller of streaming USB logic analyzers. There products have evolved over
+the years, but it all started with their original 8-channel logic analyzer:
+
+I Ohmed out the PCB and ended up with this:
+
+![Saleae Logic (original) schematic](/assets/probes/saleae_logic_original.png)
+
+We're seeing an ESD protection circuit. There are 2 such components, each one can protect 4 signals.
+There's also a 510 Ohm series resistor in the signal path.
+
+This series resistor serves 2 purposes:
+
+* it limits the current that must be consumed in case of an ESD event.
+
+    ESD events can result in voltages of thousands of volts. And ESD protection diode
+    acts like a Zener diode that starts to conduct once the voltage across its leads
+    exceeds a certain value. However, the energy of a voltage spike goes entirely through
+    the protection circuit.
+
+    A series resistor between the probe pin and the ESD protection will limit the maximum
+    current through it.
+
+* it dampens the behavior of the resonant LC circuit.
+
+Let's see how that plays out in [CircuitLab](https://www.circuitlab.com/circuit/7f592n83cvwk/probe-saleae-logic-original/):
+
+![Saleae Logic (Original) - CircuitLab schematic](/assets/probes/probe-salae_logic_original-circuitlab.png)
+
+Thanks to the damping resistor, the ringing has disappeared entirely. 
+
+[![Saleaa Logic (Original) - Transient waveform](/assets/probes/probe-saleae_logic_original-waveform.png)](/assets/probes/probe-saleae_logic_original-waveform.png)
+*Click to enlarge*
+
+There's a small dip remaining at the probe point, the orange signal, but it's not of the sort that
+it would make break the circuit-under-test.
+
+The signal at the FPGA side, or in this case, the Cypress USB chip, has a little bit of difficulty getting
+where it needs to be, but it's resonable for a 10MHz signal, especially if you consider that this logic
+analyzer has a sample rate limit of 24MHz.
+
+The frequency plot looks much more reasonable as well:
+
+[![Saleaa Logic (Original) - Frequency Response Plot](/assets/probes/probe-saleae_logic_original-freq_plot.png)](/assets/probes/probe-saleae_logic_original-freq_plot.png)
+*Click to enlarge*
 
 
 **Basic Logic Analyzer**
@@ -427,6 +525,10 @@ See patent below.
 * [StackExchange - How to determine LVCMOS output impedance?](https://electronics.stackexchange.com/questions/365871/how-to-determine-lv-cmos-output-impedance)
 
 * [TI - Measuring Board Parasitics in High-Speed Analog Design](https://www.ti.com/lit/ml/sboa094/sboa094.pdf)
+
+* [StackExchange: inductance of a probe ground wire is around 200nH](https://electronics.stackexchange.com/questions/411399/how-the-low-inductance-of-short-ground-clip-probes-prevents-interference)
+
+* [Logic Analyzer Probing Techniques for High-Speed Digital Systems](https://www.montana.edu/blameres/vitae/publications/e_conference_abst/conf_abst_001_probing_techniques.pdf)
 
 # ESD protection
 
