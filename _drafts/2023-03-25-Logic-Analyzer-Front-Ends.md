@@ -530,6 +530,8 @@ See patent below.
 
 * [Logic Analyzer Probing Techniques for High-Speed Digital Systems](https://www.montana.edu/blameres/vitae/publications/e_conference_abst/conf_abst_001_probing_techniques.pdf)
 
+* [HP 10400A Series Operating Note](https://xdevs.com/doc/HP_Agilent_Keysight/HP%2010400A%20Series%20Operating%20Note.pdf)
+
 # ESD protection
 
 * [Nexperia ESD handbook](https://assets.nexperia.com/documents/user-manual/Nexperia_document_book_ESDApplicationHandbook_2018.pdf)
