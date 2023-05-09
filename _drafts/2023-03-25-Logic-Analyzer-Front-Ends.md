@@ -1,7 +1,7 @@
 ---
 layout: post
 title: A Look at Probes and Logic Analyzer Front-Ends
-date:   2023-03-25 00:00:00 -0700
+date:   2023-03-25 00:00:00 -1000
 categories:
 ---
 

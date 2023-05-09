@@ -1,7 +1,7 @@
 ---
 layout: post
 title: DSLogic U3Pro16 Teardown
-date:   2023-03-20 00:00:00 -0700
+date:   2023-03-20 00:00:00 -1000
 categories:
 ---
 
