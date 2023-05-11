@@ -10,9 +10,24 @@ categories:
 
 # Introduction
 
-The effort of converting a captured printer trace ranges from entirely painless to
-very painful. It depends on which printer formats are supported by your instrument, and
-the desired quality.
+The year was 2020, and the offices all over the world shut down. A house remodel had just
+started, so work moved from a comfortably airconditioned room to a very messy garage.
+
+[![A very messy garage](/assets/dslogic/garage.jpg)](/assets/dslogic/garage.jpg)
+
+Since I'm in the business of developing, and debugging, hardware, a few bit of
+work equipment went along for the ride, including a Saleae Logic Pro 16. There's
+no way around it: they're at the top of USB logic analyzers. Plenty of competitors
+have matched or surpassed their digital features, but none have the ability to record 
+the 16 channels in analog format as well.
+
+I obviously used the Saleae for work stuff, but I may once in a while also have used
+it for some hobby-related activities.
+
+![Probing the pins of an HP 3478A multimeter](/assets/hp3478a/sram_with_probes.jpg)
+
+Last September, corporate offices opened up again, the Saleae went back to its
+original habitat, and I found myself without a good 16-channel USB logic analyzer.
 
 Components:
 
