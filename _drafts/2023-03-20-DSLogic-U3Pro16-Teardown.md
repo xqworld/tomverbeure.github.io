@@ -73,7 +73,7 @@ The DSLogic comes with a nice, elongated hard case.
 Inside, you'll find the following:
 
 * the device itself, a slick aluminum case
-* a USB-C to USB-A adaptor cable
+* a USB-C to USB-A cable
 * 5 4-way probe cables and 1 3-way clock and trigger cable
 * 16 test clips
 
@@ -87,12 +87,46 @@ The cables are quite stiff, we'll get to that later, and are definitely not as p
 ones that comes with a Saleae. The case has been designed such that the probe cables can
 be stored without the need to bend them. I like it.
 
-The quality of the test clips is bad, but no different than those of a $1500(!) Saleae.
+The quality of the test clips is bad, but no different than those of a $1499(!) Saleae Logic 16 Pro.
 
+# Software: From Saleae Logic to PulseView to DSView
 
+When Saleae first came to market, they raised the bar for logic analyzer software with
+Logic, which had a GUI that allowed scrolling and zooming in and out of waveforms at blazing 
+speed. Logic also added a few protocol decoders, and an C++ API to create your own decoders.
 
+It was the inspiration of PulseView, an open source equivalent that acts as the front-end
+application of SigRok, an open source library and tool that acts as the waveform acquisition
+backend. PulseView supports protocol decoders as well, but it has an easier to use Python
+API, and it allows chained protocol decoders: a low-level decoder might convert the recorded
+signals into, say, I2C transactions. A higher level I2C EPROM decoder could then decode these
+I2C into read and write operations. PulseView has tons of protocol decoders, from simple
+UART transactions, all the way to USB 2.0 decoders.
 
+When the DSLogic logic analyzer hit the market after a successful Kickstarter campaign, it shipped 
+with DSView, DreamSourceLab's closed source waveform viewer. However, people soon discovered that it 
+was a reskinned version of PulseView. A big no-no since the latter is developed under a GPL3
+license.
 
+After a bit of drama, DreamSourceLab made DSView available on GitHub under the required
+GPL3 as well, with attribution to sigrok project. DSView is still a hard fork of PulseView
+and AFAIK DreamSourceLab doesn't push changes to the PulseView project, but at least they've
+legally in the clear for the past 6 years.
+
+The default choice would be to use DSView to control your DSLogic, but Sigrok/PulseView
+support DSView as well. 
+
+I'm currently using DSView.
+
+# Installing DSView on a Linux Machine
+
+DreamSourceLab provides Windows and MacOs binaries for DSView, but not for Linux. Instead,
+when you click the Download button for Linux, it simply downloads a tar file with the
+source code, which you're expected to compile yourself!
+
+It was kind of dreading running into the usual issues with package dependencies, but
+after following the instructions in the INSTALL file, I ended up with a working executable
+on first try.
 
 
 
