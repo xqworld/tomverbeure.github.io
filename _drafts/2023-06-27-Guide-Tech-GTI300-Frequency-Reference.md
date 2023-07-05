@@ -29,48 +29,66 @@ categories:
 [![GTI300 PCB](/assets/gti300/gti300_pcb.jpg)](/assets/gti300/gti300_pcb.jpg)
 *(Click to enlarge)*
 
-# OCXO Frequency Adjust Voltage
+# OCXO Frequency Adjustment
 
-The crystal oscillator inside an OCXO isn't perfect, so your typical OCXOs comes
-with a way to tune the output frequency to the perfect value. The tuning range
-is usually quite narrow. I don't have the specification of the Vectron 318Y0839 that's
-used in the GTI300, but the famous HP 10811A/B has a 
+The crystal oscillator inside an OCXO isn't perfect, so your typical OCXO comes
+with a way to tune the output frequency to the perfect value, or to use the OCXO
+as an element in PLL.  The tuning range is usually quite narrow. I don't have the 
+specification of the Vectron 318Y0839 that's used in the GTI300, but the famous 
+HP 10811A/B has a 
 [service manual](http://hparchive.com/Manuals/HP-10811AB-Manual.pdf)
-with full schematics (and much more!) The 10811A has an output frequency
-of 10MHz and a tuning range of 1Hz, or a relative range of just of 10<sup>-7</sup>.
+with full schematics (and much more!), so let's use that for the discussion here.
 
+The 10811A has an output frequency of 10MHz and an electrical tuning range of &plusmn;1Hz, 
+or a relative range of just of 10<sup>-7</sup>.
 Most OCXOs have only 1 way to control the output frequency, by applying a voltage
-on their frequency adjust pin. The 10811A is special in that is has two options:
-through its EFC, electronic frequency adjust, input, or by changing the value of a trimmable
-capacitor.
+on their frequency adjust input. The 10811A has two options:
+through its EFC, electronic frequency adjust, input, or by changing the value of a 
+trimmable capacitor. The trimmable capacitor is used for coarse tuning and
+ can change the output frequency by &plusmn;20Hz.
 
-You can see both methods in the schematic below:
+Both tuning methods are highlighted in the schematic below:
 
 [![HP 10811A OCXO schematic](/assets/gti300/hp10811_schematic.png)](/assets/gti300/hp10811_schematic.png)
 *(Click to enlarge)*
 
-The trimcap is circled in green. The EFC circuit is marked in red.
-The fundamental goal of the EFC circuit is the same the trimcap: change the
-resonance frequency by adjusting the capacitance of the oscillation loop. In
-the case of EFC, the variable capacitance is a 
-[varicap diode](https://en.wikipedia.org/wiki/Varicap),
-with a voltage-dependent capacitance.
+The trim capacitor is circled in green. The EFC circuit is marked in red.
+
+Fundamentally, the EFC circuit and the trim capacitor achieve their goal
+the same way: they change the resonance frequency by adjusting the capacitance 
+of the oscillation loop. In the case of EFC, the variable capacitance is a 
+[varicap diode](https://en.wikipedia.org/wiki/Varicap), a diode with a capacitance
+that depends on the reverse bias voltage. Check out section 8-13 and 8-20
+of the service manual for an in-depth explanation of the oscillator theory
+of operation.
 
 For the 10811A, the EFC input accepts a voltage from -5V to 5V. If you want to
 control the OCXO with a relative precision of, say, 10<sup>-10</sup>, and the 
 EFC input has a 10<sup>-7</sup> frequency range, then you need to be
-able to control EFC with a 4 digit accuracy. You need a pretty stable
-voltage reference for that. The exact output voltage doesn't matter too
+able to control the EFC voltage with a 4 digit accuracy, which requires 
+a pretty stable voltage reference. The exact output voltage doesn't matter too
 much, you'll need to calibrate the thing anyway, but the stability over
-temperature and power supply, and the noise is.
+temperature and power supply, and the noise is imporant.
 
 The GTI300 uses the obsolete [MC1403](https://www.onsemi.com/pdf/datasheet/mc1403-d.pdf)
-voltage reference. It has an output of 2.5V and a typical temperature coefficient
+voltage reference. 
+
+[![MC1403 electrical characteristics](/assets/gti300/mc1403_characteristics.png)](/assets/gti300/mc1403_characteristics.png)
+*(Click to enlarge)*
+
+It has an output of 2.5V and a typical temperature coefficient
 of 10ppm/C. A 5C temperature difference will change the output by
 1.25mV or 0.05%. Not a lot, but higher than the 4 digit accuracy that's
 needed to maintain that 10<sup>-10</sup> OCXO precision! This is why
 it's so important to have a temperature controlled room for accurate frequency
 measurements...
+
+We can also see that it has a typical *Line Regulation* value of 0.6V for
+a supply voltage between 4.5V and 15V. This is the output voltage deviation you 
+can expect when applying different supply voltages.
+
+![OCXO tuning circuit](/assets/gti300/ocxo_tuning_circuit.png)
+
 
 # LM317 Voltage Regulator Basics
 
